@@ -1,19 +1,21 @@
 {
-  "name": "n8n-nodes-<...>",
-  "version": "0.1.0",
-  "description": "",
+  "name": "n8n-nodes-discord-selfbot",
+  "version": "1.0.1",
+  "description": "Discord automation without limits. Self-botting is against Discord's ToS. Use at your own risk.",
   "keywords": [
-    "n8n-community-node-package"
+    "n8n-community-node-package",
+    "discord.js-selfbot-v13",
+    "discord",
+    "selfbot"
   ],
   "license": "MIT",
-  "homepage": "",
   "author": {
-    "name": "",
-    "email": ""
+    "name": "iluha168",
+    "url": "https://github.com/iluha168"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/<...>/n8n-nodes-<...>.git"
+    "url": "git+https://github.com/iluha168/n8n-nodes.git"
   },
   "engines": {
     "node": ">=20.15"
@@ -33,12 +35,10 @@
   "n8n": {
     "n8nNodesApiVersion": 1,
     "credentials": [
-      "dist/credentials/ExampleCredentialsApi.credentials.js",
-      "dist/credentials/HttpBinApi.credentials.js"
+      "dist/credentials/DiscordUserApi.credentials.ts"
     ],
     "nodes": [
-      "dist/nodes/ExampleNode/ExampleNode.node.js",
-      "dist/nodes/HttpBin/HttpBin.node.js"
+      "dist/nodes/DiscordEventTrigger/DiscordEventTrigger.node.ts"
     ]
   },
   "devDependencies": {
@@ -51,5 +51,8 @@
   },
   "peerDependencies": {
     "n8n-workflow": "*"
+  },
+  "dependencies": {
+    "discord.js-selfbot-v13": "^3.7.0"
   }
 }

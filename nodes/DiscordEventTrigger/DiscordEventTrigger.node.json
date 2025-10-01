@@ -1,0 +1,22 @@
+{
+	"node": "n8n-nodes-discord-selfbot.discord-event-trigger",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": ["Communication", "HITL"],
+	"subcategories": {
+		"HITL": ["Human in the Loop"]
+	},
+	"resources": {
+		"credentialDocumentation": [
+			{
+				"url": "https://discordjs-self-v13.netlify.app/#/docs"
+			}
+		],
+		"primaryDocumentation": [
+			{
+				"url": "https://discordjs-self-v13.netlify.app/#/docs"
+			}
+		]
+	},
+	"alias": ["human", "form", "wait", "hitl", "approval"]
+}
