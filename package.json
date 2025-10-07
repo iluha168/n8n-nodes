@@ -38,7 +38,7 @@
       "dist/credentials/DiscordUserApi.credentials.ts"
     ],
     "nodes": [
-      "dist/nodes/DiscordEventTrigger/DiscordEventTrigger.node.ts"
+      "dist/nodes/DiscordEventTrigger/DiscordTrigger.node.ts"
     ]
   },
   "devDependencies": {

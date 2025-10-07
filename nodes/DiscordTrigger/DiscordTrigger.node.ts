@@ -81,16 +81,16 @@ const events: (keyof ClientEvents)[] = [
 	"messagePollVoteRemove",
 ];
 
-export class DiscordEventTrigger implements INodeType {
+export class DiscordTrigger implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: "Discord User Event Trigger",
-		name: "discordEventTrigger",
+		displayName: "Discord Trigger",
+		name: "discordTrigger",
 		group: ["trigger"],
 		version: 1,
 		description:
 			"Triggers every time the client receives a specified type of event",
 		defaults: {
-			name: "Discord User Event Trigger",
+			name: "Discord User Trigger",
 		},
 		inputs: [],
 		outputs: ["main"],

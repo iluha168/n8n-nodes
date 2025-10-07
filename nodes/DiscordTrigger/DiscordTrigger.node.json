@@ -1,10 +1,9 @@
 {
-	"node": "n8n-nodes-discord-selfbot.discord-event-trigger",
+	"node": "n8n-nodes-discord-selfbot.discord-trigger",
 	"nodeVersion": "1.0",
 	"codexVersion": "1.0",
-	"categories": ["Communication", "HITL"],
+	"categories": ["Communication"],
 	"subcategories": {
-		"HITL": ["Human in the Loop"]
 	},
 	"resources": {
 		"credentialDocumentation": [
@@ -18,5 +17,5 @@
 			}
 		]
 	},
-	"alias": ["human", "form", "wait", "hitl", "approval"]
+	"alias": ["human", "dc", "self", "user"]
 }
