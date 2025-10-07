@@ -8,7 +8,7 @@ import {
 export class DiscordUserApi implements ICredentialType {
 	name = 'discordUserApi';
 	displayName = 'Discord User API';
-	icon = 'file:DiscordUserApi.svg' as const;
+	icon = 'node:n8n-nodes-discord-selfbot.discordTrigger' as const;
 
 	documentationUrl = 'https://discordjs-self-v13.netlify.app/#/docs';
 
