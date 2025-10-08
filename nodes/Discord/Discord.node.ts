@@ -9,7 +9,7 @@ import { asBoolean, asSnowflake, asString } from "../../src/validate";
 import { getDiscordClient } from "../../src/ClientStore";
 import type { MessageOptions } from "discord.js-selfbot-v13";
 
-type Action = "send_message" | "react"
+type Action = "send_message" | "react" | "fetch_channel"
 
 export class Discord implements INodeType {
 	description: INodeTypeDescription = {
@@ -42,7 +42,8 @@ export class Discord implements INodeType {
 				options: Object
 					.entries({
 						send_message: 'Send Message',
-						react: 'React to a Message'
+						react: 'React to a Message',
+						fetch_channel: 'Get channel information',
 					} satisfies Record<Action, string>)
 					.map(([value, name]) => ({ name, value })),
 			},
@@ -54,7 +55,11 @@ export class Discord implements INodeType {
 				placeholder: "1234567890",
 				displayOptions: {
 					show: {
-						"action": ["send_message", "react"] satisfies Action[],
+						"action": [
+							"send_message",
+							"react",
+							"fetch_channel"
+						] satisfies Action[],
 					},
 				},
 			},
@@ -195,6 +200,23 @@ export class Discord implements INodeType {
 							} else {
 								throw new NodeOperationError(this.getNode(), error, {
 									description: "Failed to add reactions",
+								})
+							}
+					}
+				} break
+				case "fetch_channel": {
+					const channelId = getChannelId()
+					try {
+						const channel = await client.channels.fetch(channelId)
+						if (!channel) throw "Channel is null"
+
+						returnData.push({ json: channel.toJSON() as any, pairedItem: itemIndex })
+					} catch(error) {
+							if (this.continueOnFail()) {
+								returnData.push({ json: { channelId }, error, pairedItem: itemIndex })
+							} else {
+								throw new NodeOperationError(this.getNode(), error, {
+									description: "Failed to fetch channel",
 								})
 							}
 					}
