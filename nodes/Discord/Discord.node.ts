@@ -92,7 +92,7 @@ export class Discord implements INodeType {
 				name: "reactions",
 				type: "string",
 				default: '',
-				placeholder: "🐠👍",
+				placeholder: "can use multiple, e.g. 🐠👍",
 				displayOptions: {
 					show: {
 						"action": ["react"] satisfies Action[],
