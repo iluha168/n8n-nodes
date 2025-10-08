@@ -90,7 +90,7 @@ export class DiscordTrigger implements INodeType {
 		description:
 			"Triggers every time the client receives a specified type of event",
 		defaults: {
-			name: "Discord User Trigger",
+			name: "Discord Trigger",
 		},
 		inputs: [],
 		outputs: ["main"],

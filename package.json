@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-discord-selfbot",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Discord automation without limits. Self-botting is against Discord's ToS. Use at your own risk.",
   "keywords": [
     "n8n-community-node-package",
@@ -38,7 +38,8 @@
       "dist/credentials/DiscordUserApi.credentials.ts"
     ],
     "nodes": [
-      "dist/nodes/DiscordEventTrigger/DiscordTrigger.node.ts"
+      "dist/nodes/Discord/Discord.node.ts",
+      "dist/nodes/Discord/DiscordTrigger.node.ts"
     ]
   },
   "devDependencies": {

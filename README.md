@@ -24,6 +24,8 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 - [x] Listen to any event happening on Discord
 - [ ] Fetch data
 - [ ] Send data
+  - [x] Send messages (only text-based right now)
+  - [x] React to messages (super-react too)
 
 ## Compatibility
 

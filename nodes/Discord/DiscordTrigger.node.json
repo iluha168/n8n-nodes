@@ -1,5 +1,5 @@
 {
-	"node": "n8n-nodes-discord-selfbot.discord-trigger",
+	"node": "n8n-nodes-discord-selfbot.discordTrigger",
 	"nodeVersion": "1.0",
 	"codexVersion": "1.0",
 	"categories": ["Communication"],

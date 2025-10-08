@@ -1,0 +1,21 @@
+{
+	"node": "n8n-nodes-discord-selfbot.discord",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": ["Communication"],
+	"subcategories": {
+	},
+	"resources": {
+		"credentialDocumentation": [
+			{
+				"url": "https://discordjs-self-v13.netlify.app/#/docs"
+			}
+		],
+		"primaryDocumentation": [
+			{
+				"url": "https://discordjs-self-v13.netlify.app/#/docs"
+			}
+		]
+	},
+	"alias": ["human", "dc", "self", "user"]
+}
