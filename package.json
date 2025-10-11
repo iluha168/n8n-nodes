@@ -1,19 +1,21 @@
 {
-  "name": "n8n-nodes-<...>",
+  "name": "n8n-nodes-pelican",
   "version": "0.1.0",
-  "description": "",
+  "description": "Unofficial Pelican Panel nodes for n8n",
   "keywords": [
-    "n8n-community-node-package"
+    "n8n-community-node-package",
+    "pelican",
+    "panel",
+    "wings"
   ],
   "license": "MIT",
-  "homepage": "",
   "author": {
-    "name": "",
-    "email": ""
+    "name": "iluha168",
+    "url": "https://github.com/iluha168"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/<...>/n8n-nodes-<...>.git"
+    "url": "git+https://github.com/iluha168/n8n-nodes.git"
   },
   "engines": {
     "node": ">=20.15"
