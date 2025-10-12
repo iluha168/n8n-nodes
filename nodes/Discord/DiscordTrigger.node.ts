@@ -92,6 +92,7 @@ export class DiscordTrigger implements INodeType {
 		defaults: {
 			name: "Discord Trigger",
 		},
+		subtitle: '={{ "Event: " + $parameter.event }}',
 		inputs: [],
 		outputs: ["main"],
 		icon: "file:discord.svg",

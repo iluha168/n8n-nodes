@@ -1,9 +1,3 @@
-export function asBoolean(arg: unknown): boolean {
-	if (typeof arg !== "boolean")
-		throw new Error("Not a boolean")
-	return arg
-}
-
 export function asString(arg: unknown): string {
 	if (typeof arg !== "string")
 		throw new Error("Not a string")

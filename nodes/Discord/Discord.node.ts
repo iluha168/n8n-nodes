@@ -5,11 +5,9 @@ import {
 	type INodeType,
 	type INodeTypeDescription,
 } from "n8n-workflow";
-import { asBoolean, asSnowflake, asString } from "../../src/validate";
+import { asSnowflake, asString } from "../../src/validate";
 import { getDiscordClient } from "../../src/ClientStore";
 import type { MessageOptions } from "discord.js-selfbot-v13";
-
-type Action = "send_message" | "react" | "fetch_channel"
 
 export class Discord implements INodeType {
 	description: INodeTypeDescription = {
@@ -30,22 +28,63 @@ export class Discord implements INodeType {
 			required: true,
 		}],
 
-		subtitle: '={{ $parameter["options"] }}',
+		subtitle: '={{ $parameter.resource + ": " + $parameter.operation }}',
+
 		properties: [
 			{
-				displayName: "Action",
-				name: "action",
-				type: "options",
-				default: '',
+				displayName: 'Resource',
+				name: 'resource',
+				type: 'options',
+				default: 'channel',
 				noDataExpression: true,
 				required: true,
-				options: Object
-					.entries({
-						send_message: 'Send Message',
-						react: 'React to a Message',
-						fetch_channel: 'Get channel information',
-					} satisfies Record<Action, string>)
-					.map(([value, name]) => ({ name, value })),
+				options: [{
+					name: 'Channel',
+					value: 'channel',
+				}, {
+					name: 'Message',
+					value: 'message',
+				}]
+			},
+			{
+				displayName: "Operation",
+				name: "operation",
+				type: "options",
+				default: 'send_message',
+				noDataExpression: true,
+				required: true,
+				options: [{
+					name: 'Send Message',
+					value: 'send_message',
+					action: 'Send message',
+				}, {
+					name: 'Get Channel Information',
+					value: 'fetch_channel',
+					action: 'Get channel information',
+				}],
+				displayOptions: {
+					show: {
+						resource: ['channel'],
+					}
+				},
+			},
+			{
+				displayName: "Operation",
+				name: "operation",
+				type: "options",
+				default: 'react',
+				noDataExpression: true,
+				required: true,
+				options: [{
+					name: 'React to a Message',
+					value: 'react',
+					action: 'React to a message',
+				}],
+				displayOptions: {
+					show: {
+						resource: ['message'],
+					}
+				},
 			},
 			{
 				displayName: "Channel ID",
@@ -55,11 +94,11 @@ export class Discord implements INodeType {
 				placeholder: "1234567890",
 				displayOptions: {
 					show: {
-						"action": [
+						"operation": [
 							"send_message",
 							"react",
 							"fetch_channel"
-						] satisfies Action[],
+						],
 					},
 				},
 			},
@@ -71,7 +110,7 @@ export class Discord implements INodeType {
 				placeholder: "1234567890",
 				displayOptions: {
 					show: {
-						"action": ["react"] satisfies Action[],
+						"operation": ["react"],
 					},
 				},
 			},
@@ -83,32 +122,52 @@ export class Discord implements INodeType {
 				placeholder: "I hope this message finds you well.",
 				displayOptions: {
 					show: {
-						"action": ["send_message"] satisfies Action[],
+						"operation": ["send_message"],
 					},
 				},
 			},
 			{
 				displayName: "Reactions",
 				name: "reactions",
-				type: "string",
-				default: '',
-				placeholder: "can use multiple, e.g. 🐠👍",
+				type: "fixedCollection",
+				typeOptions: { multipleValues: true },
+				default: [],
+				placeholder: "Add Reaction",
 				displayOptions: {
 					show: {
-						"action": ["react"] satisfies Action[],
+						"operation": ["react"],
 					},
 				},
+				options: [{
+					displayName: 'Values',
+					name: 'values',
+					values: [{
+						displayName: 'Reaction',
+						name: 'reaction',
+						type: 'string',
+						default: '',
+						required: true,
+					}],
+				}],
+				required: true,
 			},
 			{
-				displayName: "Super React",
-				name: "reactions_burst",
-				type: "boolean",
-				default: false,
+				displayName: 'Additional Fields',
+				name: 'additionalFields',
+				type: 'collection',
+				default: {},
+				placeholder: 'Add Field',
 				displayOptions: {
 					show: {
-						"action": ["react"] satisfies Action[],
+						"operation": ["react"],
 					},
 				},
+				options: [{
+					displayName: "Super React",
+					name: "reactions_burst",
+					type: "boolean",
+					default: false,
+				}]
 			},
 		],
 	};
@@ -126,9 +185,9 @@ export class Discord implements INodeType {
 
 		const returnData: INodeExecutionData[] = []
 		for (const itemIndex of this.getInputData().keys()) {
-			const getGetParam = <O>(name: string, validate: (param: unknown) => O) => () => {
+			const getGetParam = <O>(name: string, validate: (param: unknown) => O, fallback?: O) => () => {
 				try {
-					return validate(this.getNodeParameter(name, itemIndex))
+					return validate(this.getNodeParameter(name, itemIndex, fallback))
 				} catch(e) {
 					throw new NodeOperationError(this.getNode(), new Error(
 		`Parameter "${name}" failed validation`,
@@ -137,12 +196,12 @@ export class Discord implements INodeType {
 				}
 			}
 
-			const action = getGetParam("action", asString)() as Action
+			const operation = getGetParam("operation", asString)()
 			const getChannelId = getGetParam("channelId", asSnowflake)
 			const getMessageId = getGetParam("messageId", asSnowflake)
 			const getContent = getGetParam("content", asString)
 
-			switch (action) {
+			switch (operation) {
 				case "send_message": {
 					const payload = { content: getContent() } satisfies MessageOptions
 					await client.channels.fetch(getChannelId())
@@ -165,30 +224,28 @@ export class Discord implements INodeType {
 						})
 				} break
 				case "react": {
-					const emojis = Array.from(new Intl.Segmenter().segment(
-						getGetParam("reactions", asString)()
-					), s => s.segment)
+					const { values: reactions } = this.getNodeParameter("reactions", itemIndex) as { values: { reaction: string }[] }
 					try {
-						const isBurst = getGetParam("reactions_burst", asBoolean)()
+						const isBurst = !!(this.getNodeParameter("additionalFields", itemIndex) as { reactions_burst?: boolean }).reactions_burst
 
 						const channel = await client.channels.fetch(getChannelId())
 						if (!channel?.isText()) throw "Not a text channel"
 
 						const message = await channel.messages.fetch(getMessageId())
-						for (const emoji of emojis) {
-							const reaction = await message.react(emoji, isBurst)
+						for (const { reaction } of reactions) {
+							const res = await message.react(reaction, isBurst)
 							returnData.push({
 								json: {
-									count: reaction.count,
-									emoji: reaction.emoji.toString(),
+									count: res.count,
+									emoji: res.emoji.toString(),
 									super: {
-										colors: reaction.burstColors,
-										count: reaction.countDetails.burst,
-										hasMe: reaction.meBurst,
+										colors: res.burstColors,
+										count: res.countDetails.burst,
+										hasMe: res.meBurst,
 									},
 									normal: {
-										count: reaction.countDetails.normal,
-										hasMe: reaction.me,
+										count: res.countDetails.normal,
+										hasMe: res.me,
 									},
 								},
 								pairedItem: itemIndex,
@@ -196,7 +253,7 @@ export class Discord implements INodeType {
 						}
 					} catch(error) {
 							if (this.continueOnFail()) {
-								returnData.push({ json: { emojis }, error, pairedItem: itemIndex })
+								returnData.push({ json: { emojis: reactions }, error, pairedItem: itemIndex })
 							} else {
 								throw new NodeOperationError(this.getNode(), error, {
 									description: "Failed to add reactions",
@@ -222,8 +279,7 @@ export class Discord implements INodeType {
 					}
 				} break
 				default:
-					action satisfies never
-					throw new NodeOperationError(this.getNode(), "Unknown action type: " + action, { itemIndex })
+					throw new NodeOperationError(this.getNode(), "Unknown action type: " + operation, { itemIndex })
 			}
 		}
 
