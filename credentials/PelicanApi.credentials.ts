@@ -8,6 +8,7 @@ import {
 export class PelicanApi implements ICredentialType {
 	name = 'pelicanApi';
 	displayName = 'Pelican API';
+	icon = 'node:n8n-nodes-pelican.pelican' as const;
 
 	documentationUrl = 'https://demo.pelican.dev/docs/api';
 
@@ -33,8 +34,16 @@ export class PelicanApi implements ICredentialType {
 				value: 'cookies',
 			}],
 			required: true,
+		},{
+			displayName: 'API Key',
+			name: 'key',
+			default: '',
+			type: 'string',
+			typeOptions: { password: true },
+			displayOptions: { show: { type: ['key'] } },
+			placeholder: 'pacc_xxxxxxxxxxxxxxxxxxxx',
+			required: true,
 		},
-		// TODO api key
 		{
 			displayName: 'Cookies',
 			name: 'cookies',
@@ -51,6 +60,7 @@ export class PelicanApi implements ICredentialType {
 		type: 'generic',
 		properties: {
 			headers: {
+				'authorization': '={{ "Bearer " + $credentials.key }}',
 				'cookie': '={{ $credentials.cookies }}',
 			},
 		},
