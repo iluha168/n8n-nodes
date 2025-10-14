@@ -1,0 +1,21 @@
+{
+	"node": "n8n-nodes-pelican.pelicanTrigger",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": ["Communication", "Development", "Data & Storage"],
+	"subcategories": {
+	},
+	"resources": {
+		"credentialDocumentation": [
+			{
+				"url": "https://demo.pelican.dev/docs/api"
+			}
+		],
+		"primaryDocumentation": [
+			{
+				"url": "https://demo.pelican.dev/docs/api"
+			}
+		]
+	},
+	"alias": ["pelican", "panel", "wings", "egg"]
+}
