@@ -35,11 +35,11 @@
   "n8n": {
     "n8nNodesApiVersion": 1,
     "credentials": [
-      "dist/credentials/DiscordUserApi.credentials.ts"
+      "dist/credentials/DiscordUserApi.credentials.js"
     ],
     "nodes": [
-      "dist/nodes/Discord/Discord.node.ts",
-      "dist/nodes/Discord/DiscordTrigger.node.ts"
+      "dist/nodes/Discord/Discord.node.js",
+      "dist/nodes/Discord/DiscordTrigger.node.js"
     ]
   },
   "devDependencies": {
