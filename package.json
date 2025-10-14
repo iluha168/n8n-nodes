@@ -38,7 +38,8 @@
       "dist/credentials/PelicanApi.credentials.js"
     ],
     "nodes": [
-      "dist/nodes/Pelican/Pelican.node.js"
+      "dist/nodes/Pelican/Pelican.node.js",
+      "dist/nodes/Pelican/PelicanTrigger.node.js"
     ]
   },
   "devDependencies": {
