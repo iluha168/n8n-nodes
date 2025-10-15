@@ -28,8 +28,8 @@ export class DiscordUserApi implements ICredentialType {
 		type: 'generic',
 		properties: {
 			headers: {
-				Authorization: '={{ $credentials.token }}'
-			}
+				Authorization: '={{ $credentials.token }}',
+			},
 		},
 	};
 

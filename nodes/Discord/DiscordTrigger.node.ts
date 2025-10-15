@@ -3,110 +3,111 @@ import type {
 	INodeTypeDescription,
 	ITriggerFunctions,
 	ITriggerResponse,
-} from "n8n-workflow";
-import { NodeOperationError } from "n8n-workflow";
-import { getDiscordClient } from "../../src/ClientStore";
-import type { ClientEvents } from "discord.js-selfbot-v13";
-import { camelCaseToTitleCase } from "../../src/camelCaseToTitleCase";
+} from 'n8n-workflow';
+import { NodeOperationError } from 'n8n-workflow';
+import { getDiscordClient } from '../../src/ClientStore';
+import type { ClientEvents } from 'discord.js-selfbot-v13';
+import { camelCaseToTitleCase } from '../../src/camelCaseToTitleCase';
 
 const events: (keyof ClientEvents)[] = [
-	"applicationCommandPermissionsUpdate",
-	"channelCreate",
-	"channelDelete",
-	"channelPinsUpdate",
-	"channelUpdate",
-	"emojiCreate",
-	"emojiDelete",
-	"emojiUpdate",
-	"guildAvailable",
-	"guildBanAdd",
-	"guildBanRemove",
-	"guildCreate",
-	"guildDelete",
-	"guildUnavailable",
-	"guildIntegrationsUpdate",
-	"guildMemberAdd",
-	"guildMemberAvailable",
-	"guildMemberRemove",
-	"guildMembersChunk",
-	"guildMemberUpdate",
-	"guildUpdate",
-	"inviteCreate",
-	"inviteDelete",
-	"messageCreate",
-	"messageDelete",
-	"messageReactionRemoveAll",
-	"messageReactionRemoveEmoji",
-	"messageDeleteBulk",
-	"messageReactionAdd",
-	"messageReactionRemove",
-	"messageUpdate",
-	"presenceUpdate",
-	"roleCreate",
-	"roleDelete",
-	"roleUpdate",
-	"threadCreate",
-	"threadDelete",
-	"threadListSync",
-	"threadMemberUpdate",
-	"threadMembersUpdate",
-	"threadUpdate",
-	"typingStart",
-	"userUpdate",
-	"voiceChannelEffectSend",
-	"voiceStateUpdate",
-	"webhookUpdate",
-	"stageInstanceCreate",
-	"stageInstanceUpdate",
-	"stageInstanceDelete",
-	"stickerCreate",
-	"stickerDelete",
-	"stickerUpdate",
-	"guildScheduledEventCreate",
-	"guildScheduledEventUpdate",
-	"guildScheduledEventDelete",
-	"guildScheduledEventUserAdd",
-	"guildScheduledEventUserRemove",
-	"guildAuditLogEntryCreate",
-	"relationshipAdd",
-	"relationshipRemove",
-	"relationshipUpdate",
-	"channelRecipientAdd",
-	"channelRecipientRemove",
-	"interactionModalCreate",
-	"callCreate",
-	"callUpdate",
-	"callDelete",
-	"messagePollVoteAdd",
-	"messagePollVoteRemove",
+	'applicationCommandPermissionsUpdate',
+	'channelCreate',
+	'channelDelete',
+	'channelPinsUpdate',
+	'channelUpdate',
+	'emojiCreate',
+	'emojiDelete',
+	'emojiUpdate',
+	'guildAvailable',
+	'guildBanAdd',
+	'guildBanRemove',
+	'guildCreate',
+	'guildDelete',
+	'guildUnavailable',
+	'guildIntegrationsUpdate',
+	'guildMemberAdd',
+	'guildMemberAvailable',
+	'guildMemberRemove',
+	'guildMembersChunk',
+	'guildMemberUpdate',
+	'guildUpdate',
+	'inviteCreate',
+	'inviteDelete',
+	'messageCreate',
+	'messageDelete',
+	'messageReactionRemoveAll',
+	'messageReactionRemoveEmoji',
+	'messageDeleteBulk',
+	'messageReactionAdd',
+	'messageReactionRemove',
+	'messageUpdate',
+	'presenceUpdate',
+	'roleCreate',
+	'roleDelete',
+	'roleUpdate',
+	'threadCreate',
+	'threadDelete',
+	'threadListSync',
+	'threadMemberUpdate',
+	'threadMembersUpdate',
+	'threadUpdate',
+	'typingStart',
+	'userUpdate',
+	'voiceChannelEffectSend',
+	'voiceStateUpdate',
+	'webhookUpdate',
+	'stageInstanceCreate',
+	'stageInstanceUpdate',
+	'stageInstanceDelete',
+	'stickerCreate',
+	'stickerDelete',
+	'stickerUpdate',
+	'guildScheduledEventCreate',
+	'guildScheduledEventUpdate',
+	'guildScheduledEventDelete',
+	'guildScheduledEventUserAdd',
+	'guildScheduledEventUserRemove',
+	'guildAuditLogEntryCreate',
+	'relationshipAdd',
+	'relationshipRemove',
+	'relationshipUpdate',
+	'channelRecipientAdd',
+	'channelRecipientRemove',
+	'interactionModalCreate',
+	'callCreate',
+	'callUpdate',
+	'callDelete',
+	'messagePollVoteAdd',
+	'messagePollVoteRemove',
 ];
 
 export class DiscordTrigger implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: "Discord Trigger",
-		name: "discordTrigger",
-		group: ["trigger"],
+		displayName: 'Discord Trigger',
+		name: 'discordTrigger',
+		group: ['trigger'],
 		version: 1,
-		description:
-			"Triggers every time the client receives a specified type of event",
+		description: 'Triggers every time the client receives a specified type of event',
 		defaults: {
-			name: "Discord Trigger",
+			name: 'Discord Trigger',
 		},
 		subtitle: '={{ "Event: " + $parameter.event }}',
 		inputs: [],
-		outputs: ["main"],
-		icon: "file:discord.svg",
+		outputs: ['main'],
+		icon: 'file:discord.svg',
 
-		credentials: [{
-			name: "discordUserApi",
-			required: true,
-		}],
+		credentials: [
+			{
+				name: 'discordUserApi',
+				required: true,
+			},
+		],
 		properties: [
 			{
-				displayName: "Event",
-				name: "event",
-				type: "options",
-				default: "",
+				displayName: 'Event',
+				name: 'event',
+				type: 'options',
+				default: '',
 				noDataExpression: true,
 				required: true,
 				options: events.map((event) => ({
@@ -118,21 +119,17 @@ export class DiscordTrigger implements INodeType {
 	};
 
 	async trigger(this: ITriggerFunctions): Promise<ITriggerResponse> {
-		const { token } = await this.getCredentials<{ token: string }>(
-			"discordUserApi",
-		);
+		const { token } = await this.getCredentials<{ token: string }>('discordUserApi');
 
 		try {
-			const event = this.getNodeParameter("event") as keyof ClientEvents;
+			const event = this.getNodeParameter('event') as keyof ClientEvents;
 			const client = await getDiscordClient(token, () => {
-				this.emitError(new Error("Connection closed"))
+				this.emitError(new Error('Connection closed'));
 			});
 
 			const onMsg = (...args: unknown[]) => {
-				const json = JSON.parse(JSON.stringify(args))
-				this.emit([this.helpers.returnJsonArray(
-					args.length === 1 ? json : [json]
-				)]);
+				const json = JSON.parse(JSON.stringify(args));
+				this.emit([this.helpers.returnJsonArray(args.length === 1 ? json : [json])]);
 			};
 
 			client.on(event, onMsg);
@@ -142,7 +139,7 @@ export class DiscordTrigger implements INodeType {
 			};
 		} catch (error) {
 			throw new NodeOperationError(this.getNode(), error, {
-				description: "Failed to connect to Discord",
+				description: 'Failed to connect to Discord',
 			});
 		}
 	}

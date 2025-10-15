@@ -4,29 +4,31 @@ import {
 	type INodeExecutionData,
 	type INodeType,
 	type INodeTypeDescription,
-} from "n8n-workflow";
-import { asSnowflake, asString } from "../../src/validate";
-import { getDiscordClient } from "../../src/ClientStore";
-import type { MessageOptions } from "discord.js-selfbot-v13";
+} from 'n8n-workflow';
+import { asSnowflake, asString } from '../../src/validate';
+import { getDiscordClient } from '../../src/ClientStore';
+import type { MessageOptions } from 'discord.js-selfbot-v13';
 
 export class Discord implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: "Discord",
-		name: "discord",
-		group: ["output"],
+		displayName: 'Discord',
+		name: 'discord',
+		group: ['output'],
 		version: 1,
-		description: "Fetch from and send data to Discord",
+		description: 'Fetch from and send data to Discord',
 		defaults: {
-			name: "Discord",
+			name: 'Discord',
 		},
-		inputs: ["main"],
-		outputs: ["main"],
-		icon: "file:discord.svg",
+		inputs: ['main'],
+		outputs: ['main'],
+		icon: 'file:discord.svg',
 
-		credentials: [{
-			name: "discordUserApi",
-			required: true,
-		}],
+		credentials: [
+			{
+				name: 'discordUserApi',
+				required: true,
+			},
+		],
 
 		subtitle: '={{ $parameter.resource + ": " + $parameter.operation }}',
 
@@ -38,117 +40,125 @@ export class Discord implements INodeType {
 				default: 'channel',
 				noDataExpression: true,
 				required: true,
-				options: [{
-					name: 'Channel',
-					value: 'channel',
-				}, {
-					name: 'Message',
-					value: 'message',
-				}]
+				options: [
+					{
+						name: 'Channel',
+						value: 'channel',
+					},
+					{
+						name: 'Message',
+						value: 'message',
+					},
+				],
 			},
 			{
-				displayName: "Operation",
-				name: "operation",
-				type: "options",
+				displayName: 'Operation',
+				name: 'operation',
+				type: 'options',
 				default: 'send_message',
 				noDataExpression: true,
 				required: true,
-				options: [{
-					name: 'Send Message',
-					value: 'send_message',
-					action: 'Send message',
-				}, {
-					name: 'Get Channel Information',
-					value: 'fetch_channel',
-					action: 'Get channel information',
-				}],
+				options: [
+					{
+						name: 'Send Message',
+						value: 'send_message',
+						action: 'Send message',
+					},
+					{
+						name: 'Get Channel Information',
+						value: 'fetch_channel',
+						action: 'Get channel information',
+					},
+				],
 				displayOptions: {
 					show: {
 						resource: ['channel'],
-					}
+					},
 				},
 			},
 			{
-				displayName: "Operation",
-				name: "operation",
-				type: "options",
+				displayName: 'Operation',
+				name: 'operation',
+				type: 'options',
 				default: 'react',
 				noDataExpression: true,
 				required: true,
-				options: [{
-					name: 'React to a Message',
-					value: 'react',
-					action: 'React to a message',
-				}],
+				options: [
+					{
+						name: 'React to a Message',
+						value: 'react',
+						action: 'React to a message',
+					},
+				],
 				displayOptions: {
 					show: {
 						resource: ['message'],
-					}
-				},
-			},
-			{
-				displayName: "Channel ID",
-				name: "channelId",
-				type: "string",
-				default: '',
-				placeholder: "1234567890",
-				displayOptions: {
-					show: {
-						"operation": [
-							"send_message",
-							"react",
-							"fetch_channel"
-						],
 					},
 				},
 			},
 			{
-				displayName: "Message ID",
-				name: "messageId",
-				type: "string",
+				displayName: 'Channel ID',
+				name: 'channelId',
+				type: 'string',
 				default: '',
-				placeholder: "1234567890",
+				placeholder: '1234567890',
 				displayOptions: {
 					show: {
-						"operation": ["react"],
+						operation: ['send_message', 'react', 'fetch_channel'],
 					},
 				},
 			},
 			{
-				displayName: "Content",
-				name: "content",
-				type: "string",
+				displayName: 'Message ID',
+				name: 'messageId',
+				type: 'string',
 				default: '',
-				placeholder: "I hope this message finds you well.",
+				placeholder: '1234567890',
 				displayOptions: {
 					show: {
-						"operation": ["send_message"],
+						operation: ['react'],
 					},
 				},
 			},
 			{
-				displayName: "Reactions",
-				name: "reactions",
-				type: "fixedCollection",
+				displayName: 'Content',
+				name: 'content',
+				type: 'string',
+				default: '',
+				placeholder: 'I hope this message finds you well.',
+				displayOptions: {
+					show: {
+						operation: ['send_message'],
+					},
+				},
+			},
+			{
+				displayName: 'Reactions',
+				name: 'reactions',
+				type: 'fixedCollection',
 				typeOptions: { multipleValues: true },
 				default: [],
-				placeholder: "Add Reaction",
+				placeholder: 'Add Reaction',
 				displayOptions: {
 					show: {
-						"operation": ["react"],
+						operation: ['react'],
 					},
 				},
-				options: [{
-					displayName: 'Values',
-					name: 'values',
-					values: [{
-						displayName: 'Reaction',
-						name: 'reaction',
-						type: 'string',
-						default: '',
-						required: true,
-					}],
-				}],
+				options: [
+					{
+						displayName: 'Values',
+						name: 'values',
+						values: [
+							{
+								displayName: 'Reaction',
+								name: 'reaction',
+								type: 'string',
+								default: '',
+								required: true,
+							},
+						],
+					},
+				],
 				required: true,
 			},
 			{
@@ -159,130 +169,148 @@ export class Discord implements INodeType {
 				placeholder: 'Add Field',
 				displayOptions: {
 					show: {
-						"operation": ["react"],
+						operation: ['react'],
 					},
 				},
-				options: [{
-					displayName: "Super React",
-					name: "reactions_burst",
-					type: "boolean",
-					default: false,
-				}]
+				options: [
+					{
+						displayName: 'Super React',
+						name: 'reactions_burst',
+						type: 'boolean',
+						default: false,
+					},
+				],
 			},
 		],
 	};
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
-		const { token } = await this.getCredentials<{ token: string }>(
-			"discordUserApi",
-		);
-		const client = await getDiscordClient(token)
-			.catch(e => {
-				throw new NodeOperationError(this.getNode(), e, {
-					description: "Failed to connect to Discord",
-				})
-			})
+		const { token } = await this.getCredentials<{ token: string }>('discordUserApi');
+		const client = await getDiscordClient(token).catch((e) => {
+			throw new NodeOperationError(this.getNode(), e, {
+				description: 'Failed to connect to Discord',
+			});
+		});
 
-		const returnData: INodeExecutionData[] = []
+		const returnData: INodeExecutionData[] = [];
 		for (const itemIndex of this.getInputData().keys()) {
-			const getGetParam = <O>(name: string, validate: (param: unknown) => O, fallback?: O) => () => {
-				try {
-					return validate(this.getNodeParameter(name, itemIndex, fallback))
-				} catch(e) {
-					throw new NodeOperationError(this.getNode(), new Error(
-		`Parameter "${name}" failed validation`,
-						{ cause: e },
-					), { itemIndex })
-				}
-			}
+			const getGetParam =
+				<O>(name: string, validate: (param: unknown) => O, fallback?: O) =>
+				() => {
+					try {
+						return validate(this.getNodeParameter(name, itemIndex, fallback));
+					} catch (e) {
+						throw new NodeOperationError(
+							this.getNode(),
+							new Error(`Parameter "${name}" failed validation`, { cause: e }),
+							{ itemIndex },
+						);
+					}
+				};
 
-			const operation = getGetParam("operation", asString)()
-			const getChannelId = getGetParam("channelId", asSnowflake)
-			const getMessageId = getGetParam("messageId", asSnowflake)
-			const getContent = getGetParam("content", asString)
+			const operation = getGetParam('operation', asString)();
+			const getChannelId = getGetParam('channelId', asSnowflake);
+			const getMessageId = getGetParam('messageId', asSnowflake);
+			const getContent = getGetParam('content', asString);
 
 			switch (operation) {
-				case "send_message": {
-					const payload = { content: getContent() } satisfies MessageOptions
-					await client.channels.fetch(getChannelId())
-						.then(channel => channel?.isText()
-							? channel.send(payload)
-							: Promise.reject("Not a text channel")
-						)
-						.then(msg => returnData.push({
-							json: msg.toJSON() as any,
-							pairedItem: itemIndex,
-						}))
-						.catch(error => {
-							if (this.continueOnFail()) {
-								returnData.push({ json: payload, error, pairedItem: itemIndex })
-								return
+				case 'send_message':
+					{
+						const payload = { content: getContent() } satisfies MessageOptions;
+						await client.channels
+							.fetch(getChannelId())
+							.then((channel) =>
+								channel?.isText() ? channel.send(payload) : Promise.reject('Not a text channel'),
+							)
+							.then((msg) =>
+								returnData.push({
+									json: msg.toJSON() as any,
+									pairedItem: itemIndex,
+								}),
+							)
+							.catch((error) => {
+								if (this.continueOnFail()) {
+									returnData.push({ json: payload, error, pairedItem: itemIndex });
+									return;
+								}
+								throw new NodeOperationError(this.getNode(), error, {
+									description: 'Failed to send message',
+								});
+							});
+					}
+					break;
+				case 'react':
+					{
+						const { values: reactions } = this.getNodeParameter('reactions', itemIndex) as {
+							values: { reaction: string }[];
+						};
+						try {
+							const isBurst = !!(
+								this.getNodeParameter('additionalFields', itemIndex) as {
+									reactions_burst?: boolean;
+								}
+							).reactions_burst;
+
+							const channel = await client.channels.fetch(getChannelId());
+							if (!channel?.isText()) throw 'Not a text channel';
+
+							const message = await channel.messages.fetch(getMessageId());
+							for (const { reaction } of reactions) {
+								const res = await message.react(reaction, isBurst);
+								returnData.push({
+									json: {
+										count: res.count,
+										emoji: res.emoji.toString(),
+										super: {
+											colors: res.burstColors,
+											count: res.countDetails.burst,
+											hasMe: res.meBurst,
+										},
+										normal: {
+											count: res.countDetails.normal,
+											hasMe: res.me,
+										},
+									},
+									pairedItem: itemIndex,
+								});
 							}
-							throw new NodeOperationError(this.getNode(), error, {
-								description: "Failed to send message",
-							})
-						})
-				} break
-				case "react": {
-					const { values: reactions } = this.getNodeParameter("reactions", itemIndex) as { values: { reaction: string }[] }
-					try {
-						const isBurst = !!(this.getNodeParameter("additionalFields", itemIndex) as { reactions_burst?: boolean }).reactions_burst
-
-						const channel = await client.channels.fetch(getChannelId())
-						if (!channel?.isText()) throw "Not a text channel"
-
-						const message = await channel.messages.fetch(getMessageId())
-						for (const { reaction } of reactions) {
-							const res = await message.react(reaction, isBurst)
-							returnData.push({
-								json: {
-									count: res.count,
-									emoji: res.emoji.toString(),
-									super: {
-										colors: res.burstColors,
-										count: res.countDetails.burst,
-										hasMe: res.meBurst,
-									},
-									normal: {
-										count: res.countDetails.normal,
-										hasMe: res.me,
-									},
-								},
-								pairedItem: itemIndex,
-							})
+						} catch (error) {
+							if (this.continueOnFail()) {
+								returnData.push({ json: { emojis: reactions }, error, pairedItem: itemIndex });
+							} else {
+								throw new NodeOperationError(this.getNode(), error, {
+									description: 'Failed to add reactions',
+								});
+							}
 						}
-					} catch(error) {
-							if (this.continueOnFail()) {
-								returnData.push({ json: { emojis: reactions }, error, pairedItem: itemIndex })
-							} else {
-								throw new NodeOperationError(this.getNode(), error, {
-									description: "Failed to add reactions",
-								})
-							}
 					}
-				} break
-				case "fetch_channel": {
-					const channelId = getChannelId()
-					try {
-						const channel = await client.channels.fetch(channelId)
-						if (!channel) throw "Channel is null"
+					break;
+				case 'fetch_channel':
+					{
+						const channelId = getChannelId();
+						try {
+							const channel = await client.channels.fetch(channelId);
+							if (!channel) throw 'Channel is null';
 
-						returnData.push({ json: channel.toJSON() as any, pairedItem: itemIndex })
-					} catch(error) {
+							returnData.push({ json: channel.toJSON() as any, pairedItem: itemIndex });
+						} catch (error) {
 							if (this.continueOnFail()) {
-								returnData.push({ json: { channelId }, error, pairedItem: itemIndex })
+								returnData.push({ json: { channelId }, error, pairedItem: itemIndex });
 							} else {
 								throw new NodeOperationError(this.getNode(), error, {
-									description: "Failed to fetch channel",
-								})
+									description: 'Failed to fetch channel',
+								});
 							}
+						}
 					}
-				} break
+					break;
 				default:
-					throw new NodeOperationError(this.getNode(), "Unknown action type: " + operation, { itemIndex })
+					throw new NodeOperationError(this.getNode(), 'Unknown action type: ' + operation, {
+						itemIndex,
+					});
 			}
 		}
 
-		return [this.helpers.returnJsonArray(returnData)]
+		return [this.helpers.returnJsonArray(returnData)];
 	}
 }

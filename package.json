@@ -1,61 +1,61 @@
 {
-  "name": "n8n-nodes-discord-selfbot",
-  "version": "2.0.1",
-  "description": "Discord automation without limits. Self-botting is against Discord's ToS. Use at your own risk.",
-  "keywords": [
-    "n8n-community-node-package",
-    "discord.js-selfbot-v13",
-    "discord",
-    "selfbot"
-  ],
-  "license": "MIT",
-  "author": {
-    "name": "iluha168",
-    "url": "https://github.com/iluha168"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/iluha168/n8n-nodes.git"
-  },
-  "engines": {
-    "node": ">=20.15"
-  },
-  "main": "index.js",
-  "scripts": {
-    "build": "npx rimraf dist && tsc && gulp build:icons",
-    "dev": "tsc --watch",
-    "format": "prettier nodes credentials --write",
-    "lint": "eslint nodes credentials package.json",
-    "lintfix": "eslint nodes credentials package.json --fix",
-    "prepublishOnly": "npm run build && npm run lint -c .eslintrc.prepublish.js nodes credentials package.json"
-  },
-  "files": [
-    "dist"
-  ],
-  "n8n": {
-    "n8nNodesApiVersion": 1,
-    "credentials": [
-      "dist/credentials/DiscordUserApi.credentials.js"
-    ],
-    "nodes": [
-      "dist/nodes/Discord/Discord.node.js",
-      "dist/nodes/Discord/DiscordTrigger.node.js"
-    ]
-  },
-  "devDependencies": {
-    "@typescript-eslint/parser": "~8.32.0",
-    "eslint": "^8.57.0",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-n8n-nodes-base": "^1.16.3",
-    "eslint-plugin-prettier": "^5.5.4",
-    "gulp": "^5.0.0",
-    "prettier": "^3.5.3",
-    "typescript": "^5.8.2"
-  },
-  "peerDependencies": {
-    "n8n-workflow": "*"
-  },
-  "dependencies": {
-    "discord.js-selfbot-v13": "^3.7.0"
-  }
+	"name": "n8n-nodes-discord-selfbot",
+	"version": "2.0.1",
+	"description": "Discord automation without limits. Self-botting is against Discord's ToS. Use at your own risk.",
+	"keywords": [
+		"n8n-community-node-package",
+		"discord.js-selfbot-v13",
+		"discord",
+		"selfbot"
+	],
+	"license": "MIT",
+	"author": {
+		"name": "iluha168",
+		"url": "https://github.com/iluha168"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/iluha168/n8n-nodes.git"
+	},
+	"engines": {
+		"node": ">=20.15"
+	},
+	"main": "index.js",
+	"scripts": {
+		"build": "npx rimraf dist && tsc && gulp build:icons",
+		"dev": "tsc --watch",
+		"format": "prettier nodes credentials --write",
+		"lint": "eslint nodes credentials package.json",
+		"lintfix": "eslint nodes credentials package.json --fix",
+		"prepublishOnly": "npm run build && npm run lint -c .eslintrc.prepublish.js nodes credentials package.json"
+	},
+	"files": [
+		"dist"
+	],
+	"n8n": {
+		"n8nNodesApiVersion": 1,
+		"credentials": [
+			"dist/credentials/DiscordUserApi.credentials.js"
+		],
+		"nodes": [
+			"dist/nodes/Discord/Discord.node.js",
+			"dist/nodes/Discord/DiscordTrigger.node.js"
+		]
+	},
+	"devDependencies": {
+		"@typescript-eslint/parser": "~8.32.0",
+		"eslint": "^8.57.0",
+		"eslint-config-prettier": "^10.1.8",
+		"eslint-plugin-n8n-nodes-base": "^1.16.3",
+		"eslint-plugin-prettier": "^5.5.4",
+		"gulp": "^5.0.0",
+		"prettier": "^3.5.3",
+		"typescript": "^5.8.2"
+	},
+	"peerDependencies": {
+		"n8n-workflow": "*"
+	},
+	"dependencies": {
+		"discord.js-selfbot-v13": "^3.7.0"
+	}
 }
