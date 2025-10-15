@@ -23,10 +23,12 @@ export class PelicanTrigger implements INodeType {
 		icon: 'file:pelican.svg',
 		usableAsTool: true,
 
-		credentials: [{
-			name: "pelicanApi",
-			required: true,
-		}],
+		credentials: [
+			{
+				name: 'pelicanApi',
+				required: true,
+			},
+		],
 
 		properties: [
 			{
@@ -34,10 +36,12 @@ export class PelicanTrigger implements INodeType {
 				name: 'resource',
 				type: 'options',
 				default: 'client',
-				options: [{
-					name: 'Client',
-					value: 'client',
-				}],
+				options: [
+					{
+						name: 'Client',
+						value: 'client',
+					},
+				],
 				required: true,
 				noDataExpression: true,
 			},
@@ -51,7 +55,7 @@ export class PelicanTrigger implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['client'],
-					}
+					},
 				},
 			},
 			{
@@ -62,72 +66,79 @@ export class PelicanTrigger implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['client'],
-					}
+					},
 				},
-				options: [{
-					name: "Console",
-					value: "console",
-					action: 'On new console message',
-				}, {
-					name: "Status",
-					value: "status",
-					action: 'On server stopping running etc',
-				}, {
-					name: "Stats",
-					value: "stats",
-					action: 'On resource statistics update',
-				}],
+				options: [
+					{
+						name: 'Console',
+						value: 'console',
+						action: 'On new console message',
+					},
+					{
+						name: 'Status',
+						value: 'status',
+						action: 'On server stopping running etc',
+					},
+					{
+						name: 'Stats',
+						value: 'stats',
+						action: 'On resource statistics update',
+					},
+				],
 				required: true,
 				noDataExpression: true,
 			},
 		],
-	}
+	};
 
 	async trigger(this: ITriggerFunctions): Promise<ITriggerResponse> {
-		const credentials = await this.getCredentials<({
-			type: "cookies"
-			cookies: string
-		} | {
-			type: "key"
-			key: string
-		}) & {
-			url: string
-		}>('pelicanApi')
+		const credentials = await this.getCredentials<
+			(
+				| {
+						type: 'cookies';
+						cookies: string;
+				  }
+				| {
+						type: 'key';
+						key: string;
+				  }
+			) & {
+				url: string;
+			}
+		>('pelicanApi');
 
 		const headers: HeadersInit = {
-			accept: "application/json"
-		}
-		switch(credentials.type) {
+			accept: 'application/json',
+		};
+		switch (credentials.type) {
 			case 'cookies':
-				headers.cookies = credentials.cookies
-				break
+				headers.cookies = credentials.cookies;
+				break;
 			case 'key':
-				headers.authorization = "Bearer " + credentials.key
-				break
+				headers.authorization = 'Bearer ' + credentials.key;
+				break;
 			default:
-				throw new NodeApiError(this.getNode(), {}, { message: "Unknown credential type" })
+				throw new NodeApiError(this.getNode(), {}, { message: 'Unknown credential type' });
 		}
 
 		try {
 			const server = await getPelicanServer(
 				new URL(credentials.url),
-				this.getNodeParameter("server") as string,
-				headers
-			)
-			server.once('disconnected', () => this.emitError(new Error("Connection closed")))
+				this.getNodeParameter('server') as string,
+				headers,
+			);
+			server.once('disconnected', () => this.emitError(new Error('Connection closed')));
 
-			const operation = this.getNodeParameter("operation") as "console" | "status" | "stats"
-			const callback = (data: any) => this.emit([
-				this.helpers.returnJsonArray([data])
-			])
-			server.on(operation, callback)
+			const operation = this.getNodeParameter('operation') as 'console' | 'status' | 'stats';
+			const callback = (data: any) => this.emit([this.helpers.returnJsonArray([data])]);
+			server.on(operation, callback);
 			return {
 				async closeFunction() {
-					server.off(operation, callback)
-				}
+					server.off(operation, callback);
+				},
 			};
-		} catch(error) {
-			throw new NodeApiError(this.getNode(), { error })
+		} catch (error) {
+			throw new NodeApiError(this.getNode(), { error });
 		}
 	}
 }

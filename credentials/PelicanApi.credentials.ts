@@ -26,15 +26,19 @@ export class PelicanApi implements ICredentialType {
 			name: 'type',
 			default: 'key',
 			type: 'options',
-			options: [{
-				name: 'Key',
-				value: 'key',
-			}, {
-				name: 'Cookies',
-				value: 'cookies',
-			}],
+			options: [
+				{
+					name: 'Key',
+					value: 'key',
+				},
+				{
+					name: 'Cookies',
+					value: 'cookies',
+				},
+			],
 			required: true,
-		},{
+		},
+		{
 			displayName: 'API Key',
 			name: 'key',
 			default: '',
@@ -60,8 +64,8 @@ export class PelicanApi implements ICredentialType {
 		type: 'generic',
 		properties: {
 			headers: {
-				'authorization': '={{ "Bearer " + $credentials.key }}',
-				'cookie': '={{ $credentials.cookies }}',
+				authorization: '={{ "Bearer " + $credentials.key }}',
+				cookie: '={{ $credentials.cookies }}',
 			},
 		},
 	};
