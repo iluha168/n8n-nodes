@@ -17,6 +17,18 @@ This is an n8n community node. It lets you use Pelican in your n8n workflows.
 Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation.
 
 ## Operations
+- ### Server triggers:
+	- ⚡🧑‍💻 Wait for new console message
+	- ⚡🔋 Wait for power status change
+	- ⚡💽 Stats update (network, RAM, disk usage)
+- ### User:
+  - 👤 Get own profile
+  - 🧑‍💻 Send a command to server console
+  - 🔌 Control power state of the server
+  - 🔋 Wait for one of certain power states of the server
+- ### Administration:
+	- 👥 Get users list
+	- 🧮 Get servers list
 
 ## Credentials
 
