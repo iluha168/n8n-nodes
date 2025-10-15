@@ -49,6 +49,10 @@ export class Discord implements INodeType {
 						name: 'Message',
 						value: 'message',
 					},
+					{
+						name: 'User',
+						value: 'user',
+					},
 				],
 			},
 			{
@@ -97,6 +101,26 @@ export class Discord implements INodeType {
 				},
 			},
 			{
+				displayName: 'Operation',
+				name: 'operation',
+				type: 'options',
+				default: 'fetch_user',
+				noDataExpression: true,
+				required: true,
+				options: [
+					{
+						name: 'Get User Information',
+						value: 'fetch_user',
+						action: 'Get user information',
+					},
+				],
+				displayOptions: {
+					show: {
+						resource: ['user'],
+					},
+				},
+			},
+			{
 				displayName: 'Channel ID',
 				name: 'channelId',
 				type: 'string',
@@ -117,6 +141,18 @@ export class Discord implements INodeType {
 				displayOptions: {
 					show: {
 						operation: ['react'],
+					},
+				},
+			},
+			{
+				displayName: 'User ID',
+				name: 'userId',
+				type: 'string',
+				default: '',
+				placeholder: '1234567890',
+				displayOptions: {
+					show: {
+						operation: ['fetch_user'],
 					},
 				},
 			},
@@ -211,6 +247,7 @@ export class Discord implements INodeType {
 			const operation = getGetParam('operation', asString)();
 			const getChannelId = getGetParam('channelId', asSnowflake);
 			const getMessageId = getGetParam('messageId', asSnowflake);
+			const getUserId = getGetParam('userId', asSnowflake);
 			const getContent = getGetParam('content', asString);
 
 			switch (operation) {
@@ -299,6 +336,24 @@ export class Discord implements INodeType {
 							} else {
 								throw new NodeOperationError(this.getNode(), error, {
 									description: 'Failed to fetch channel',
+								});
+							}
+						}
+					}
+					break;
+				case 'fetch_user':
+					{
+						const userId = getUserId();
+						try {
+							const user = await client.users.fetch(userId);
+
+							returnData.push({ json: user.toJSON() as any, pairedItem: itemIndex });
+						} catch (error) {
+							if (this.continueOnFail()) {
+								returnData.push({ json: { userId }, error, pairedItem: itemIndex });
+							} else {
+								throw new NodeOperationError(this.getNode(), error, {
+									description: 'Failed to fetch user',
 								});
 							}
 						}
