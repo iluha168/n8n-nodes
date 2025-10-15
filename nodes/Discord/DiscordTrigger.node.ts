@@ -124,7 +124,9 @@ export class DiscordTrigger implements INodeType {
 
 		try {
 			const event = this.getNodeParameter("event") as keyof ClientEvents;
-			const client = await getDiscordClient(token);
+			const client = await getDiscordClient(token, () => {
+				this.emitError(new Error("Connection closed"))
+			});
 
 			const onMsg = (...args: unknown[]) => {
 				const json = JSON.parse(JSON.stringify(args))
