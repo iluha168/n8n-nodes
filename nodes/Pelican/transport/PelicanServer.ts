@@ -52,13 +52,24 @@ export async function getPelicanServer(
 	return server;
 }
 
-type ServerAction = 'start' | 'stop' | 'restart' | 'kill';
+export type ServerAction = 'start' | 'stop' | 'restart' | 'kill';
+export function asServerAction(action: string): ServerAction {
+	if (!['start', 'stop', 'restart', 'kill'].includes(action)) {
+		throw new Error(`'${action}' is not a valid action`);
+	}
+	return action as ServerAction;
+}
+
 type Status = 'stopping' | 'offline' | 'starting' | 'running';
 
 type EventServerbound =
 	| {
-			event: 'send command' | 'auth';
+			event: 'auth';
 			args: [token: string];
+	  }
+	| {
+			event: 'send command';
+			args: [command: string];
 	  }
 	| {
 			event: 'send logs' | 'send stats';

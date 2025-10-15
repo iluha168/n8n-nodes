@@ -39,7 +39,8 @@
 		],
 		"nodes": [
 			"dist/nodes/Pelican/Pelican.node.js",
-			"dist/nodes/Pelican/PelicanTrigger.node.js"
+			"dist/nodes/Pelican/PelicanTrigger.node.js",
+			"dist/nodes/Pelican/PelicanServer.node.js"
 		]
 	},
 	"devDependencies": {

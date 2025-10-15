@@ -6,6 +6,7 @@ import {
 	type ITriggerResponse,
 } from 'n8n-workflow';
 import { getPelicanServer } from './transport/PelicanServer';
+import { parseCredentials } from './transport/parseCredentials';
 
 export class PelicanTrigger implements INodeType {
 	description: INodeTypeDescription = {
@@ -92,38 +93,10 @@ export class PelicanTrigger implements INodeType {
 	};
 
 	async trigger(this: ITriggerFunctions): Promise<ITriggerResponse> {
-		const credentials = await this.getCredentials<
-			(
-				| {
-						type: 'cookies';
-						cookies: string;
-				  }
-				| {
-						type: 'key';
-						key: string;
-				  }
-			) & {
-				url: string;
-			}
-		>('pelicanApi');
-
-		const headers: HeadersInit = {
-			accept: 'application/json',
-		};
-		switch (credentials.type) {
-			case 'cookies':
-				headers.cookies = credentials.cookies;
-				break;
-			case 'key':
-				headers.authorization = 'Bearer ' + credentials.key;
-				break;
-			default:
-				throw new NodeApiError(this.getNode(), {}, { message: 'Unknown credential type' });
-		}
-
+		const { url, headers } = await parseCredentials(this);
 		try {
 			const server = await getPelicanServer(
-				new URL(credentials.url),
+				url,
 				this.getNodeParameter('server') as string,
 				headers,
 			);
