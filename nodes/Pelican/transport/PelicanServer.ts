@@ -60,7 +60,7 @@ export function asServerAction(action: string): ServerAction {
 	return action as ServerAction;
 }
 
-type Status = 'stopping' | 'offline' | 'starting' | 'running';
+export type Status = 'stopping' | 'offline' | 'starting' | 'running';
 
 type EventServerbound =
 	| {

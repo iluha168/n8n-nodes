@@ -1,11 +1,17 @@
 import {
 	NodeApiError,
+	NodeOperationError,
 	type IExecuteFunctions,
 	type INodeExecutionData,
 	type INodeType,
 	type INodeTypeDescription,
 } from 'n8n-workflow';
-import { asServerAction, getPelicanServer, type ServerAction } from './transport/PelicanServer';
+import {
+	asServerAction,
+	getPelicanServer,
+	type ServerAction,
+	type Status,
+} from './transport/PelicanServer';
 import { parseCredentials } from './transport/parseCredentials';
 
 export class PelicanServer implements INodeType {
@@ -80,6 +86,11 @@ export class PelicanServer implements INodeType {
 						value: 'set_state',
 						action: 'Control power state of the server',
 					},
+					{
+						name: 'Wait Power State',
+						value: 'wait_state',
+						action: 'Wait for a certain power state of the server',
+					},
 				],
 				required: true,
 				noDataExpression: true,
@@ -125,39 +136,88 @@ export class PelicanServer implements INodeType {
 				] satisfies { name: string; value: ServerAction }[],
 				required: true,
 			},
+			{
+				displayName: 'Status',
+				name: 'status',
+				type: 'multiOptions',
+				default: [],
+				displayOptions: {
+					show: {
+						operation: ['wait_state'],
+					},
+				},
+				options: [
+					{
+						name: 'Starting',
+						value: 'starting',
+					},
+					{
+						name: 'Stopping',
+						value: 'stopping',
+					},
+					{
+						name: 'Running',
+						value: 'running',
+					},
+					{
+						name: 'Offline',
+						value: 'offline',
+					},
+				] satisfies { name: string; value: Status }[],
+				required: true,
+			},
 		],
 	};
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const { url, headers } = await parseCredentials(this);
 
+		const returnData: INodeExecutionData[] = [];
+
 		for (const itemIndex of this.getInputData().keys()) {
 			try {
-				const server = await getPelicanServer(
-					url,
-					this.getNodeParameter('server', itemIndex) as string,
-					headers,
-				);
+				const getServer = () =>
+					getPelicanServer(url, this.getNodeParameter('server', itemIndex) as string, headers);
+				let server = await getServer();
 
 				const operation = this.getNodeParameter('operation', itemIndex) as string;
 				switch (operation) {
 					case 'send_command':
 						server.send('send command', this.getNodeParameter('command', itemIndex) as string);
+						returnData.push({ json: { ok: true } });
 						break;
 					case 'set_state':
 						server.send(
 							'set state',
 							asServerAction(this.getNodeParameter('state', itemIndex) as string),
 						);
+						returnData.push({ json: { ok: true } });
 						break;
+					case 'wait_state': {
+						const desiredStatuses = this.getNodeParameter('status', itemIndex) as Status[];
+						const foundStatus = await new Promise<Status>((res, rej) => {
+							const onStatus = ({ status }: { status: Status }) => {
+								if (desiredStatuses.includes(status)) {
+									server.off('status', onStatus);
+									res(status);
+								}
+							};
+							server.on('status', onStatus);
+							server.on('disconnected', () => {
+								rej("Abrupt disconnection from Pelican. Try 'retry on fail' mode?");
+							});
+						});
+						returnData.push({ json: { ok: true, status: foundStatus } });
+						break;
+					}
+					default:
+						throw new NodeOperationError(this.getNode(), `Unknown operation: '${operation}'`);
 				}
 			} catch (error) {
 				throw new NodeApiError(this.getNode(), { json: { ok: false }, error });
 			}
 		}
 
-		return [
-			this.helpers.returnJsonArray(Array(this.getInputData().length).fill({ json: { ok: true } })),
-		];
+		return [this.helpers.returnJsonArray(returnData)];
 	}
 }

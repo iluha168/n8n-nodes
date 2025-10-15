@@ -2,8 +2,9 @@
 	"node": "n8n-nodes-pelican.pelicanServer",
 	"nodeVersion": "1.0",
 	"codexVersion": "1.0",
-	"categories": ["Communication", "Development", "Data & Storage"],
+	"categories": ["Communication", "Development", "HITL"],
 	"subcategories": {
+		"HITL": ["Human in the Loop"]
 	},
 	"resources": {
 		"credentialDocumentation": [
