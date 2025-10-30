@@ -121,6 +121,11 @@ export class Discord implements INodeType {
 						value: 'fetch_user',
 						action: 'Get user information',
 					},
+					{
+						name: 'Get User Profile',
+						value: 'fetch_profile',
+						action: 'Get user profile',
+					},
 				],
 				displayOptions: {
 					show: {
@@ -157,18 +162,18 @@ export class Discord implements INodeType {
 				displayName: 'Operation',
 				name: 'operation',
 				type: 'options',
-				default: 'fetch_members',
+				default: 'fetch_profiles',
 				noDataExpression: true,
 				required: true,
 				options: [
 					{
 						name: 'Get Members',
-						value: 'fetch_members',
+						value: 'fetch_profiles',
 						action: 'Get guild members',
 					},
 					{
 						name: 'Get Member Profile',
-						value: 'fetch_member',
+						value: 'fetch_profile',
 						action: 'Get member profile',
 					},
 				],
@@ -186,7 +191,7 @@ export class Discord implements INodeType {
 				placeholder: '1234567890',
 				displayOptions: {
 					show: {
-						operation: ['fetch_members', 'fetch_member'],
+						operation: ['fetch_profiles', 'fetch_profile'],
 					},
 				},
 			},
@@ -222,7 +227,7 @@ export class Discord implements INodeType {
 				placeholder: '1234567890',
 				displayOptions: {
 					show: {
-						operation: ['fetch_user', 'fetch_member'],
+						operation: ['fetch_user', 'fetch_profile'],
 					},
 				},
 			},
@@ -430,14 +435,20 @@ export class Discord implements INodeType {
 						}
 					}
 					break;
-				case 'fetch_member':
+				case 'fetch_profile':
 					{
 						const userId = getUserId();
-						const guildId = getGuildId();
+						const guildId = await Promise.try(getGuildId).catch(() => null);
 						try {
-							const guild = await client.guilds.fetch(guildId);
-							const member = await guild.members.fetch({ user: userId });
-							const profile = await member.user.getProfile(guildId);
+							// https://github.com/aiko-chan-ai/discord.js-selfbot-v13/blob/bf38318902cea8d0110d638e1dfadc01aec6b7cc/src/structures/User.js#L492
+							const query: Record<string, unknown> = {
+								with_mutual_guilds: true,
+								with_mutual_friends: true,
+								with_mutual_friends_count: true,
+							};
+							if (guildId) query.guild_id = guildId;
+
+							const profile = await (client.api as any).users(userId).profile.get({ query });
 
 							returnData.push({ json: profile, pairedItem: itemIndex });
 						} catch (error) {
@@ -473,7 +484,7 @@ export class Discord implements INodeType {
 						pairedItem: itemIndex,
 					});
 					break;
-				case 'fetch_members':
+				case 'fetch_profiles':
 					{
 						const guildId = getGuildId();
 						try {
