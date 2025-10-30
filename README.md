@@ -26,6 +26,7 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
   - [x] Fetch channels
   - [x] Fetch users
   - [x] Get friends of current user
+  - [x] Fetch guild members
 - [ ] Send data
   - [x] Send messages (only text-based right now)
   - [x] React to messages (super-react too)

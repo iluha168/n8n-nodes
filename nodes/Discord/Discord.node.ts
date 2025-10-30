@@ -46,16 +46,20 @@ export class Discord implements INodeType {
 						value: 'channel',
 					},
 					{
+						name: 'Guild',
+						value: 'guild',
+					},
+					{
+						name: 'Me',
+						value: 'me',
+					},
+					{
 						name: 'Message',
 						value: 'message',
 					},
 					{
 						name: 'User',
 						value: 'user',
-					},
-					{
-						name: 'Me',
-						value: 'me',
 					},
 				],
 			},
@@ -141,6 +145,38 @@ export class Discord implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['me'],
+					},
+				},
+			},
+			{
+				displayName: 'Operation',
+				name: 'operation',
+				type: 'options',
+				default: 'fetch_members',
+				noDataExpression: true,
+				required: true,
+				options: [
+					{
+						name: 'Get Members',
+						value: 'fetch_members',
+						action: 'Get guild members',
+					},
+				],
+				displayOptions: {
+					show: {
+						resource: ['guild'],
+					},
+				},
+			},
+			{
+				displayName: 'Guild ID',
+				name: 'guildId',
+				type: 'string',
+				default: '',
+				placeholder: '1234567890',
+				displayOptions: {
+					show: {
+						operation: ['fetch_members'],
 					},
 				},
 			},
@@ -269,6 +305,7 @@ export class Discord implements INodeType {
 				};
 
 			const operation = getGetParam('operation', asString)();
+			const getGuildId = getGetParam('guildId', asSnowflake);
 			const getChannelId = getGetParam('channelId', asSnowflake);
 			const getMessageId = getGetParam('messageId', asSnowflake);
 			const getUserId = getGetParam('userId', asSnowflake);
@@ -393,6 +430,32 @@ export class Discord implements INodeType {
 						},
 						pairedItem: itemIndex,
 					});
+					break;
+				case 'fetch_members':
+					{
+						const guildId = getGuildId();
+						try {
+							const guild = await client.guilds.fetch(guildId);
+							const members = (await guild.members.fetch())
+								.values()
+								.map((member) => {
+									const copy = { ...member, guild: undefined };
+									delete copy.guild;
+									return copy;
+								})
+								.toArray();
+
+							returnData.push({ json: { members }, pairedItem: itemIndex });
+						} catch (error) {
+							if (this.continueOnFail()) {
+								returnData.push({ json: { guildId }, error, pairedItem: itemIndex });
+							} else {
+								throw new NodeOperationError(this.getNode(), error, {
+									description: 'Failed to fetch guild members',
+								});
+							}
+						}
+					}
 					break;
 				default:
 					throw new NodeOperationError(this.getNode(), 'Unknown action type: ' + operation, {
