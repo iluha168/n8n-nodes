@@ -24,7 +24,7 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 - [x] Listen to **any** event happening on Discord
 - [ ] Fetch data
   - [x] Fetch channels
-  - [x] Fetch users
+  - [x] Fetch users & their profiles
   - [x] Get friends of current user
   - [x] Fetch guild members
 - [ ] Send data

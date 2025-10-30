@@ -161,6 +161,11 @@ export class Discord implements INodeType {
 						value: 'fetch_members',
 						action: 'Get guild members',
 					},
+					{
+						name: 'Get Member Profile',
+						value: 'fetch_member',
+						action: 'Get member profile',
+					},
 				],
 				displayOptions: {
 					show: {
@@ -176,7 +181,7 @@ export class Discord implements INodeType {
 				placeholder: '1234567890',
 				displayOptions: {
 					show: {
-						operation: ['fetch_members'],
+						operation: ['fetch_members', 'fetch_member'],
 					},
 				},
 			},
@@ -212,7 +217,7 @@ export class Discord implements INodeType {
 				placeholder: '1234567890',
 				displayOptions: {
 					show: {
-						operation: ['fetch_user'],
+						operation: ['fetch_user', 'fetch_member'],
 					},
 				},
 			},
@@ -415,6 +420,27 @@ export class Discord implements INodeType {
 							} else {
 								throw new NodeOperationError(this.getNode(), error, {
 									description: 'Failed to fetch user',
+								});
+							}
+						}
+					}
+					break;
+				case 'fetch_member':
+					{
+						const userId = getUserId();
+						const guildId = getGuildId();
+						try {
+							const guild = await client.guilds.fetch(guildId);
+							const member = await guild.members.fetch({ user: userId });
+							const profile = await member.user.getProfile(guildId);
+
+							returnData.push({ json: profile, pairedItem: itemIndex });
+						} catch (error) {
+							if (this.continueOnFail()) {
+								returnData.push({ json: { userId, guildId }, error, pairedItem: itemIndex });
+							} else {
+								throw new NodeOperationError(this.getNode(), error, {
+									description: 'Failed to fetch profile',
 								});
 							}
 						}
