@@ -53,6 +53,10 @@ export class Discord implements INodeType {
 						name: 'User',
 						value: 'user',
 					},
+					{
+						name: 'Me',
+						value: 'me',
+					},
 				],
 			},
 			{
@@ -117,6 +121,26 @@ export class Discord implements INodeType {
 				displayOptions: {
 					show: {
 						resource: ['user'],
+					},
+				},
+			},
+			{
+				displayName: 'Operation',
+				name: 'operation',
+				type: 'options',
+				default: 'fetch_friends',
+				noDataExpression: true,
+				required: true,
+				options: [
+					{
+						name: 'Get My Friends',
+						value: 'fetch_friends',
+						action: 'Get my friends',
+					},
+				],
+				displayOptions: {
+					show: {
+						resource: ['me'],
 					},
 				},
 			},
@@ -358,6 +382,17 @@ export class Discord implements INodeType {
 							}
 						}
 					}
+					break;
+				case 'fetch_friends':
+					returnData.push({
+						json: {
+							friends: client.relationships.friendCache
+								.entries()
+								.map(([id, user]) => ({ id, ...(user?.toJSON() as object | null) }))
+								.toArray(),
+						},
+						pairedItem: itemIndex,
+					});
 					break;
 				default:
 					throw new NodeOperationError(this.getNode(), 'Unknown action type: ' + operation, {

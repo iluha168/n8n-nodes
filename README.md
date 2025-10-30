@@ -21,10 +21,11 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 
 ## Operations
 
-- [x] Listen to any event happening on Discord
+- [x] Listen to **any** event happening on Discord
 - [ ] Fetch data
   - [x] Fetch channels
   - [x] Fetch users
+  - [x] Get friends of current user
 - [ ] Send data
   - [x] Send messages (only text-based right now)
   - [x] React to messages (super-react too)
