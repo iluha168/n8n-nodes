@@ -141,6 +141,11 @@ export class Discord implements INodeType {
 						value: 'fetch_friends',
 						action: 'Get my friends',
 					},
+					{
+						name: 'Get Guilds I Am In',
+						value: 'fetch_guilds',
+						action: 'Get guilds I am in',
+					},
 				],
 				displayOptions: {
 					show: {
@@ -452,6 +457,17 @@ export class Discord implements INodeType {
 							friends: client.relationships.friendCache
 								.entries()
 								.map(([id, user]) => ({ id, ...(user?.toJSON() as object | null) }))
+								.toArray(),
+						},
+						pairedItem: itemIndex,
+					});
+					break;
+				case 'fetch_guilds':
+					returnData.push({
+						json: {
+							guilds: (await client.guilds.fetch())
+								.entries()
+								.map(([id, guild]) => ({ id, ...(guild?.toJSON() as object | null) }))
 								.toArray(),
 						},
 						pairedItem: itemIndex,
