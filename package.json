@@ -1,6 +1,6 @@
 {
 	"name": "n8n-nodes-discord-selfbot",
-	"version": "2.0.2",
+	"version": "2.0.3",
 	"description": "Discord automation without limits. Self-botting is against Discord's ToS. Use at your own risk.",
 	"keywords": [
 		"n8n-community-node-package",
