@@ -101,6 +101,11 @@ export class Discord implements INodeType {
 						value: 'react',
 						action: 'React to a message',
 					},
+					{
+						name: 'Edit a Message',
+						value: 'edit_message',
+						action: 'Edit a message',
+					},
 				],
 				displayOptions: {
 					show: {
@@ -203,7 +208,7 @@ export class Discord implements INodeType {
 				placeholder: '1234567890',
 				displayOptions: {
 					show: {
-						operation: ['send_message', 'react', 'fetch_channel'],
+						operation: ['send_message', 'react', 'fetch_channel', 'edit_message'],
 					},
 				},
 			},
@@ -215,7 +220,7 @@ export class Discord implements INodeType {
 				placeholder: '1234567890',
 				displayOptions: {
 					show: {
-						operation: ['react'],
+						operation: ['react', 'edit_message'],
 					},
 				},
 			},
@@ -239,7 +244,7 @@ export class Discord implements INodeType {
 				placeholder: 'I hope this message finds you well.',
 				displayOptions: {
 					show: {
-						operation: ['send_message'],
+						operation: ['send_message', 'edit_message'],
 					},
 				},
 			},
@@ -396,6 +401,34 @@ export class Discord implements INodeType {
 								});
 							}
 						}
+					}
+					break;
+				case 'edit_message':
+					{
+						const payload = { content: getContent() } satisfies MessageOptions;
+						await client.channels
+							.fetch(getChannelId())
+							.then((channel) =>
+								channel?.isText()
+									? channel.messages.fetch(getMessageId())
+									: Promise.reject('Not a text channel'),
+							)
+							.then((msg) => msg.edit(payload))
+							.then((msg) =>
+								returnData.push({
+									json: msg.toJSON() as any,
+									pairedItem: itemIndex,
+								}),
+							)
+							.catch((error) => {
+								if (this.continueOnFail()) {
+									returnData.push({ json: payload, error, pairedItem: itemIndex });
+									return;
+								}
+								throw new NodeOperationError(this.getNode(), error, {
+									description: 'Failed to edit message',
+								});
+							});
 					}
 					break;
 				case 'fetch_channel':

@@ -29,7 +29,7 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
   - [x] Get guilds of current user
   - [x] Fetch guild members
 - [ ] Send data
-  - [x] Send messages (only text-based right now)
+  - [x] Send and edit messages (only text-based right now)
   - [x] React to messages (super-react too)
 
 ## Compatibility
