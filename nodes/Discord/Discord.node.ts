@@ -81,6 +81,11 @@ export class Discord implements INodeType {
 						value: 'fetch_channel',
 						action: 'Get channel information',
 					},
+					{
+						name: 'Get Message',
+						value: 'fetch_message',
+						action: 'Get message',
+					},
 				],
 				displayOptions: {
 					show: {
@@ -208,7 +213,7 @@ export class Discord implements INodeType {
 				placeholder: '1234567890',
 				displayOptions: {
 					show: {
-						operation: ['send_message', 'react', 'fetch_channel', 'edit_message'],
+						operation: ['send_message', 'react', 'fetch_channel', 'edit_message', 'fetch_message'],
 					},
 				},
 			},
@@ -220,7 +225,7 @@ export class Discord implements INodeType {
 				placeholder: '1234567890',
 				displayOptions: {
 					show: {
-						operation: ['react', 'edit_message'],
+						operation: ['react', 'edit_message', 'fetch_message'],
 					},
 				},
 			},
@@ -445,6 +450,31 @@ export class Discord implements INodeType {
 							} else {
 								throw new NodeOperationError(this.getNode(), error, {
 									description: 'Failed to fetch channel',
+								});
+							}
+						}
+					}
+					break;
+				case 'fetch_message':
+					{
+						const channelId = getChannelId();
+						const messageId = getMessageId();
+						try {
+							const msg = await client.channels
+								.fetch(channelId)
+								.then((channel) =>
+									channel?.isText()
+										? channel.messages.fetch(messageId)
+										: Promise.reject('Not a text channel'),
+								);
+
+							returnData.push({ json: msg.toJSON() as any, pairedItem: itemIndex });
+						} catch (error) {
+							if (this.continueOnFail()) {
+								returnData.push({ json: { channelId, messageId }, error, pairedItem: itemIndex });
+							} else {
+								throw new NodeOperationError(this.getNode(), error, {
+									description: 'Failed to fetch message',
 								});
 							}
 						}

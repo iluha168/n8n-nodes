@@ -25,6 +25,7 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 - [ ] Fetch data
   - [x] Fetch channels
   - [x] Fetch users & their profiles
+  - [x] Fetch messages
   - [x] Get friends of current user
   - [x] Get guilds of current user
   - [x] Fetch guild members
