@@ -86,6 +86,10 @@ type EventClientbound =
 			args: never;
 	  }
 	| {
+			event: 'jwt error';
+			args: [message: string];
+	  }
+	| {
 			event: 'console output' | 'install output';
 			args: [console: string];
 	  }
@@ -128,6 +132,7 @@ export class PelicanServer extends EventEmitter<{
 					break;
 				case 'token expiring':
 				case 'token expired':
+				case 'jwt error':
 					this.send('auth', await getJWT());
 					break;
 				case 'status':
