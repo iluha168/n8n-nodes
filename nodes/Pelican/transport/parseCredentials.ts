@@ -6,11 +6,11 @@ export async function parseCredentials(fns: FunctionsBase) {
 			| {
 					type: 'cookies';
 					cookies: string;
-			  }
+			}
 			| {
 					type: 'key';
 					key: string;
-			  }
+			}
 		) & {
 			url: string;
 		}

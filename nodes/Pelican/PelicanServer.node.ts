@@ -7,12 +7,12 @@ import {
 	type INodeTypeDescription,
 } from 'n8n-workflow';
 import {
-	asServerAction,
-	getPelicanServer,
-	type ServerAction,
+	PelicanServerConsole,
+	type Stats,
 	type Status,
-} from './transport/PelicanServer';
+} from './transport/PelicanServerConsole';
 import { parseCredentials } from './transport/parseCredentials';
+import { asServerAction, type ServerAction } from './transport/ServerAction';
 
 export class PelicanServer implements INodeType {
 	description: INodeTypeDescription = {
@@ -27,7 +27,7 @@ export class PelicanServer implements INodeType {
 		},
 		inputs: ['main'],
 		outputs: ['main'],
-		icon: 'file:pelican.svg',
+		icon: 'file:../../icons/pelican.svg',
 		usableAsTool: true,
 
 		credentials: [
@@ -91,6 +91,11 @@ export class PelicanServer implements INodeType {
 						value: 'wait_state',
 						action: 'Wait for a certain power state of the server',
 					},
+					{
+						name: 'Wait Stats',
+						value: 'wait_stats',
+						action: 'Fetch the server stats',
+					}
 				],
 				required: true,
 				noDataExpression: true,
@@ -176,38 +181,48 @@ export class PelicanServer implements INodeType {
 
 		for (const itemIndex of this.getInputData().keys()) {
 			try {
-				const getServer = () =>
-					getPelicanServer(url, this.getNodeParameter('server', itemIndex) as string, headers);
-				let server = await getServer();
+				const server = PelicanServerConsole.create(
+					this.getNodeParameter('server', itemIndex) as string,
+					url, headers, this.logger
+				);
 
 				const operation = this.getNodeParameter('operation', itemIndex) as string;
 				switch (operation) {
 					case 'send_command':
-						server.send('send command', this.getNodeParameter('command', itemIndex) as string);
+						await server.command(this.getNodeParameter('command', itemIndex) as string);
 						returnData.push({ json: { ok: true } });
 						break;
 					case 'set_state':
-						server.send(
-							'set state',
+						await server.power(
 							asServerAction(this.getNodeParameter('state', itemIndex) as string),
 						);
 						returnData.push({ json: { ok: true } });
 						break;
 					case 'wait_state': {
 						const desiredStatuses = this.getNodeParameter('status', itemIndex) as Status[];
-						const foundStatus = await new Promise<Status>((res, rej) => {
-							const onStatus = ({ status }: { status: Status }) => {
+						const status = await new Promise<Status>((resolve) => {
+							const controller = new AbortController();
+							server.on('status', ({ status }) => {
 								if (desiredStatuses.includes(status)) {
-									server.off('status', onStatus);
-									res(status);
+									controller.abort();
+									resolve(status);
 								}
-							};
-							server.on('status', onStatus);
-							server.on('disconnected', () => {
-								rej("Abrupt disconnection from Pelican. Try 'retry on fail' mode?");
-							});
+							}, controller.signal);
+							this.onExecutionCancellation(() => controller.abort());
 						});
-						returnData.push({ json: { ok: true, status: foundStatus } });
+						returnData.push({ json: { ok: true, status } });
+						break;
+					}
+					case 'wait_stats': {
+						const stats = await new Promise<Stats>((resolve) => {
+							const controller = new AbortController();
+							server.on('stats', stats => {
+								controller.abort();
+								resolve(stats);
+							}, controller.signal);
+							this.onExecutionCancellation(() => controller.abort());
+						});
+						returnData.push({ json: { ok: true, stats } });
 						break;
 					}
 					default:

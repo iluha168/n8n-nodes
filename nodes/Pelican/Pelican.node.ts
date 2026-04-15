@@ -13,7 +13,7 @@ export class Pelican implements INodeType {
 		},
 		inputs: ['main'],
 		outputs: ['main'],
-		icon: 'file:pelican.svg',
+		icon: 'file:../../icons/pelican.svg',
 		usableAsTool: true,
 
 		credentials: [

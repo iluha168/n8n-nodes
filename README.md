@@ -18,14 +18,15 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 
 ## Operations
 - ### Server triggers:
-	- ⚡🧑‍💻 Wait for new console message
-	- ⚡🔋 Wait for power status change
-	- ⚡💽 Stats update (network, RAM, disk usage)
+	- ⚡🧑‍💻 On new console message
+	- ⚡🔋 On power status change
+	- ⚡💽 Stats update: network, RAM, disk usage, uptime
 - ### User:
   - 👤 Get own profile
   - 🧑‍💻 Send a command to server console
   - 🔌 Control power state of the server
-  - 🔋 Wait for one of certain power states of the server
+  - 🔋 Wait for specific power states of a server
+  - 💽 Fetch statistics of a server
 - ### Administration:
 	- 👥 Get users list
 	- 🧮 Get servers list
@@ -40,9 +41,9 @@ Authentication via cookies (the same way the panel does) is also possible, thoug
 
 Tested on
 
-- n8n version 1.114.4
-- Pelican Panel v1.0.0-beta25
-- Pelican Wings v1.0.0-beta17
+- n8n version 2.15.1
+- Pelican Panel v1.0.0-beta33
+- Pelican Wings v1.0.0-beta24
 
 ## Resources
 

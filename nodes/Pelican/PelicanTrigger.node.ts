@@ -1,11 +1,10 @@
 import {
-	NodeApiError,
-	type INodeType,
+	NodeApiError, type INodeType,
 	type INodeTypeDescription,
 	type ITriggerFunctions,
-	type ITriggerResponse,
+	type ITriggerResponse
 } from 'n8n-workflow';
-import { getPelicanServer } from './transport/PelicanServer';
+import { PelicanServerConsole, type PelicanServerConsoleEvents } from './transport/PelicanServerConsole';
 import { parseCredentials } from './transport/parseCredentials';
 
 export class PelicanTrigger implements INodeType {
@@ -21,7 +20,7 @@ export class PelicanTrigger implements INodeType {
 		},
 		inputs: [],
 		outputs: ['main'],
-		icon: 'file:pelican.svg',
+		icon: 'file:../../icons/pelican.svg',
 		usableAsTool: true,
 
 		credentials: [
@@ -85,7 +84,7 @@ export class PelicanTrigger implements INodeType {
 						value: 'stats',
 						action: 'On resource statistics update',
 					},
-				],
+				] satisfies { name: string, value: keyof PelicanServerConsoleEvents, action: string }[],
 				required: true,
 				noDataExpression: true,
 			},
@@ -95,20 +94,20 @@ export class PelicanTrigger implements INodeType {
 	async trigger(this: ITriggerFunctions): Promise<ITriggerResponse> {
 		const { url, headers } = await parseCredentials(this);
 		try {
-			const server = await getPelicanServer(
-				url,
+			const server = PelicanServerConsole.create(
 				this.getNodeParameter('server') as string,
-				headers,
+				url, headers, this.logger
 			);
-			server.once('disconnected', () => this.emitError(new Error('Connection closed')));
 
-			const operation = this.getNodeParameter('operation') as 'console' | 'status' | 'stats';
-			const callback = (data: any) => this.emit([this.helpers.returnJsonArray([data])]);
-			server.on(operation, callback);
+			const controller = new AbortController();
+			server.on(
+				this.getNodeParameter('operation') as keyof PelicanServerConsoleEvents,
+				data => this.emit([this.helpers.returnJsonArray([data])]),
+				controller.signal
+			);
+
 			return {
-				async closeFunction() {
-					server.off(operation, callback);
-				},
+				closeFunction: async () => controller.abort(),
 			};
 		} catch (error) {
 			throw new NodeApiError(this.getNode(), { error });
